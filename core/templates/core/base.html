@@ -32,11 +32,13 @@
             background-color: #1E441E;
         }
         .nav-item{
-            font-size: 1rem;
+            font-size: 1.2rem;
         }
     </style>
 
     {% block extra_header %}{% endblock extra_header %}
+    {% load livereload_tags %}
+    {% livereload_script %}
 </head>
 <body>
     <nav class="navbar navbar-expand-md bg-poly-green mb-3">
