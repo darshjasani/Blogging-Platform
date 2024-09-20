@@ -32,7 +32,7 @@
             background-color: #1E441E;
         }
         .nav-item{
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
     </style>
 
@@ -41,52 +41,28 @@
     {% livereload_script %}
 </head>
 <body>
+    
     <nav class="navbar navbar-expand-md bg-poly-green mb-3">
         <div class="container-fluid">
-            <a class="navbar-brand link-light" href="{% url 'home' %}">Django Blog</a>
-            {% if user.is_authenticated %}
-                <!-- Welcome message for xs to sm devices -->
-                <span class="navbar-text text-light d-md-none">
-                    Welcome, {{ user.get_full_name|default:user.username }}
-                </span>
-            {% endif %}
+            <a class="navbar-brand link-light" href="{% url 'home' %}">DJ Blogging Platform</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link link-light" href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
-                    </li>
+                <div class="d-flex ms-auto mb-2 mb-lg-0">
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link link-light" href="{% url 'post' %}"><i class="fas fa-edit"></i> Post</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link link-light" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        </li>
+                        <a class="btn btn-outline-light me-2" href="{% url 'post' %}">Post</a>
+                        <a class="btn btn-light" href="{% url 'logout' %}">Logout</a>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link link-light" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link link-light" href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a>
-                        </li>
+                        <a class="btn btn-outline-light me-2" href="{% url 'login' %}">Login</a>
+                        <a class="btn btn-light" href="{% url 'register' %}">Sign Up</a>
                     {% endif %}
-                </ul>
-                <form class="d-flex" role="search" action="{% url 'home' %}" method="get">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search">
-                    <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
-                </form>
+                </div>
             </div>
-            {% if user.is_authenticated %}
-                <!-- Welcome message for m to xl devices -->
-                <span class="navbar-text text-light d-none d-md-inline">
-                    &nbsp; Welcome, {{ user.get_full_name|default:user.username }}
-                </span>
-            {% endif %}
+            </div>
         </div>
-      </nav>
+    </nav>
+    
 
     
     {% if messages %}

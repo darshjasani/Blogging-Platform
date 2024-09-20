@@ -1,0 +1,37 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">
+            {% if user == comment.user %}
+                You
+            {% else %}
+                {{ comment.user.get_full_name|default:comment.user.username }}
+            {% endif %}
+        </h5>
+        <p class="card-text">{{ comment.text }}</p>
+        <p class="card-text">
+            <small class="text-muted">{{ comment.created_at }}</small>
+        </p>
+        <button class="btn btn-link reply-button" data-comment-id="{{ comment.id }}">Reply</button>
+
+        <!-- Display only 2 nested comments initially -->
+        <div class="nested-comments">
+            {% for child_comment in comment.children.all %}
+                <div class="nested-comment {% if forloop.counter > 2 %} d-none {% endif %}" data-parent-id="{{ comment.id }}">
+                    {% include "partials/comment.html" with comment=child_comment %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Show "Load More" button if there are more than 2 nested comments -->
+        {% if comment.children.count > 2 %}
+            <button class="btn btn-link load-more-comments" data-comment-id="{{ comment.id }}">Load more comments</button>
+        {% endif %}
+        
+        <!-- Form for replying -->
+        <form id="reply-form-{{ comment.id }}" class="reply-form" method="POST" style="display:none;">
+            {% csrf_token %}
+            <input type="text" class="form-control mb-2 reply-text" name="form" placeholder="Reply here...">
+            <button type="submit" class="btn btn-primary mb-4">Submit Reply</button>
+        </form>
+    </div>
+</div>

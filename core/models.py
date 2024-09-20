@@ -20,8 +20,9 @@ class BlogModel(models.Model):
 
 class CommentModel(models.Model):
     blog = models.ForeignKey(BlogModel, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)  # Reference to parent comment
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
