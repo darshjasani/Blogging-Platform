@@ -53,7 +53,7 @@
     </div>
 
     <!-- Comments -->
-    <div class="comment-section mb-4">
+    <!-- <div class="comment-section mb-4">
         <h3 class="mb-2">Comments</h3>
         {% for comment in blog.commentmodel_set.all %}
             <div class="card mb-3">
@@ -86,7 +86,29 @@
             </form>
         </div>
     </div>
-</div>
+</div> -->
+
+    <div class="comment-section mb-4">
+        <h3 class="mb-2">Comments</h3>
+        {% for comment in root_comments %}
+            {% include 'core/comment.html' with comment=comment %}
+        {% empty %}
+            <p id="no-comment">No comments yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="row">
+        <div class="col col-md-10 col-lg-8 col-xl-6">
+            <form id="comment-form" class="card card-body" method="POST" action="{% url 'comment_create' blog.id %}">
+                {% csrf_token %}
+                <label class="mb-2 h4" for="comment-text"><i class="far fa-comment"></i> Add a Comment</label>
+                <textarea id="comment-text" class="form-control mb-2" name="text" placeholder="Write your comment here..." required></textarea>
+                <button type="submit" class="btn btn-primary mb-4">Submit</button>
+            </form>
+        </div>
+    </div>
+    
+
 {% endblock %}
 
 

@@ -9,6 +9,10 @@ from django.urls import reverse_lazy
 from django.db.models import Count
 from django.db.models import Q
 from django.views import View
+from django.views.generic.edit import FormView
+from django.shortcuts import get_object_or_404, redirect
+from .models import BlogModel, CommentModel
+from .forms import CommentForm
 
 from .forms import CommentForm
 from .models import BlogModel
@@ -96,8 +100,14 @@ class BlogDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = self.get_object().title
+        blog = self.get_object()
+
+        # Filter comments that have no parent (root comments)
+        root_comments = blog.commentmodel_set.filter(parent__isnull=True)
+
+        context['title'] = blog.title
         context['comment_form'] = CommentForm()
+        context['root_comments'] = root_comments  # Pass root comments to the template
         return context
 
 
@@ -154,3 +164,25 @@ class BlogDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
         context = super().get_context_data(**kwargs)
         context['title'] = 'Delete Blog'
         return context
+    
+class CommentCreateView(FormView):
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        blog_id = self.kwargs['blog_id']
+        blog = get_object_or_404(BlogModel, id=blog_id)
+
+        parent_id = form.cleaned_data.get('parent', None)
+        parent = None
+        if parent_id:
+            parent = get_object_or_404(CommentModel, id=parent_id)
+
+        comment = CommentModel(
+            text=form.cleaned_data['text'],
+            blog=blog,
+            user=self.request.user,
+            parent=parent
+        )
+        comment.save()
+
+        return redirect('blog_detail', pk=blog_id)

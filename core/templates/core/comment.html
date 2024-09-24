@@ -1,0 +1,45 @@
+{% csrf_token %}
+{% load crispy_forms_tags %}
+    
+
+{% block content %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">
+            {% if user == comment.user %}
+                You
+            {% else %}
+                {{ comment.user.get_full_name|default:comment.user.username }}
+            {% endif %}
+        </h5>
+        <p class="card-text">{{ comment.text }}</p>
+        <p class="card-text">
+            <small class="text-muted">{{ comment.created_at }}</small>
+        </p>
+
+        <!-- Reply button and form -->
+        {% if user.is_authenticated %}
+            <a href="#" class="reply-btn" data-comment-id="{{ comment.id }}">Reply</a>
+            <form id="reply-form-{{ comment.id }}" class="reply-form" style="display:none;" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="parent" value="{{ comment.id }}">
+                <input type="hidden" name="blog_id" value="{{ blog.id }}"> <!-- Blog ID to associate the comment -->
+                <input type="text" name="text" class="form-control mb-2" placeholder="Reply to this comment" required>
+                <button type="submit" class="btn btn-primary mt-2">Submit Reply</button>
+            </form>
+        {% endif %}
+        
+        <!-- Display replies recursively -->
+        {% for reply in comment.commentmodel_set.all %}
+            <div class="ml-4">
+                {% include 'core/comment.html' with comment=reply %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_script %}
+
+{% endblock extra_script %}
