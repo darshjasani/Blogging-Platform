@@ -164,7 +164,7 @@ class BlogDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
         context = super().get_context_data(**kwargs)
         context['title'] = 'Delete Blog'
         return context
-    
+
 class CommentCreateView(FormView):
     form_class = CommentForm
 
@@ -172,16 +172,16 @@ class CommentCreateView(FormView):
         blog_id = self.kwargs['blog_id']
         blog = get_object_or_404(BlogModel, id=blog_id)
 
-        parent_id = form.cleaned_data.get('parent', None)
-        parent = None
-        if parent_id:
-            parent = get_object_or_404(CommentModel, id=parent_id)
+        parent_comment_id = form.cleaned_data.get('parent')
+        parent_comment = None
+        if parent_comment_id:
+            parent_comment = get_object_or_404(CommentModel, id=parent_comment_id)
 
         comment = CommentModel(
             text=form.cleaned_data['text'],
             blog=blog,
             user=self.request.user,
-            parent=parent
+            parent=parent_comment  # Ensure parent_comment is either None or a valid CommentModel instance
         )
         comment.save()
 

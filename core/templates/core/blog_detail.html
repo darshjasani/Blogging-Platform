@@ -152,56 +152,56 @@
     });
 
 
-    // Comment Script
-    const commentForm = document.getElementById('comment-form');
-    const commentText = document.getElementById('comment-text');
-    const noComment = document.getElementById('no-comment');
+    // // // Comment Script
+    // // const commentForm = document.getElementById('comment-form');
+    // // const commentText = document.getElementById('comment-text');
+    // // const noComment = document.getElementById('no-comment');
 
-    commentForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const text = commentText.value;
-        const blogId = "{{ blog.id }}"; // Replace with the actual blog ID
+    // // commentForm.addEventListener('submit', (event) => {
+    //     event.preventDefault();
+    //     const text = commentText.value;
+    //     const blogId = "{{ blog.id }}"; // Replace with the actual blog ID
 
-        fetch(`/api/blog/${blogId}/comment/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-            },
-            body: JSON.stringify({ text }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === 'Comment created successfully') {
-                // Clear the comment input and remove error message
-                commentText.value = '';
-                if (noComment) noComment.style.display = 'none';
+    //     fetch(`/api/blog/${blogId}/comment/`, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'X-CSRFToken': csrfToken,
+    //         },
+    //         body: JSON.stringify({ text }),
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         if (data.message === 'Comment created successfully') {
+    //             // Clear the comment input and remove error message
+    //             commentText.value = '';
+    //             if (noComment) noComment.style.display = 'none';
                 
-                // Create and append the new comment to the comments section
-                const commentSection = document.querySelector('.comment-section');
-                const newComment = document.createElement('div');
-                newComment.classList.add('card', 'mb-3');
-                newComment.innerHTML = `
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            You
-                        </h5>
-                        <p class="card-text">${text}</p>
-                        <p class="card-text">
-                            <small class="text-muted">Just now</small>
-                        </p>
-                    </div>
-                `;
-                commentSection.appendChild(newComment);
-            } else {
-                // Handle errors (e.g., display an error message)
-                alert('Failed to create a comment. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
+    //             // Create and append the new comment to the comments section
+    //             const commentSection = document.querySelector('.comment-section');
+    //             const newComment = document.createElement('div');
+    //             newComment.classList.add('card', 'mb-3');
+    //             newComment.innerHTML = `
+    //                 <div class="card-body">
+    //                     <h5 class="card-title">
+    //                         You
+    //                     </h5>
+    //                     <p class="card-text">${text}</p>
+    //                     <p class="card-text">
+    //                         <small class="text-muted">Just now</small>
+    //                     </p>
+    //                 </div>
+    //             `;
+    //             commentSection.appendChild(newComment);
+    //         } else {
+    //             // Handle errors (e.g., display an error message)
+    //             alert('Failed to create a comment. Please try again.');
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.error('Error:', error);
+    //     });
+    // });
 </script>
 {% endblock extra_script %}
     
