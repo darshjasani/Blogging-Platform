@@ -52,8 +52,6 @@
         </div>
     </div>
 
-    <!-- Comments -->
-    <!-- <div class="comment-section mb-4">
         <h3 class="mb-2">Comments</h3>
         {% for comment in blog.commentmodel_set.all %}
             <div class="card mb-3">
@@ -74,39 +72,23 @@
         {% empty %}
             <p id="no-comment">No comments yet.</p>
         {% endfor %}
-    </div>
 
-    <div class="row">
-        <div class="col col-md-10 col-lg-8 col-xl-6">
-            <form id="comment-form" class="card card-body" method="POST">
-                {% csrf_token %}
-                <label class="mb-2 h4" for="comment-text"><i class="far fa-comment"></i> Comment</label>
-                <input id="comment-text" type="text" class="form-control mb-2" name="form" placeholder="Comment here...">
-                <button type="submit" class="btn btn-primary mb-4">Submit</button>
-            </form>
+        <div class="row mb-2">
+            <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+                <form id="comment-form" class="card card-body" method="POST">
+                    {% csrf_token %}
+                    <label class="mb-2 h4" for="comment-text">
+                        <i class="far fa-comment"></i> Comment
+                    </label>
+                    <input id="comment-text" type="text" class="form-control mb-3" name="form" placeholder="Comment here...">
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </form>
+            </div>
         </div>
-    </div>
-</div> -->
+    </div> 
+</div>
 
-    <div class="comment-section mb-4">
-        <h3 class="mb-2">Comments</h3>
-        {% for comment in root_comments %}
-            {% include 'core/comment.html' with comment=comment %}
-        {% empty %}
-            <p id="no-comment">No comments yet.</p>
-        {% endfor %}
-    </div>
-
-    <div class="row">
-        <div class="col col-md-10 col-lg-8 col-xl-6">
-            <form id="comment-form" class="card card-body" method="POST" action="{% url 'comment_create' blog.id %}">
-                {% csrf_token %}
-                <label class="mb-2 h4" for="comment-text"><i class="far fa-comment"></i> Add a Comment</label>
-                <textarea id="comment-text" class="form-control mb-2" name="text" placeholder="Write your comment here..." required></textarea>
-                <button type="submit" class="btn btn-primary mb-4">Submit</button>
-            </form>
-        </div>
-    </div>
+   
     
 
 {% endblock %}
@@ -150,58 +132,6 @@
             .catch();
         });
     });
-
-
-    // // // Comment Script
-    // // const commentForm = document.getElementById('comment-form');
-    // // const commentText = document.getElementById('comment-text');
-    // // const noComment = document.getElementById('no-comment');
-
-    // // commentForm.addEventListener('submit', (event) => {
-    //     event.preventDefault();
-    //     const text = commentText.value;
-    //     const blogId = "{{ blog.id }}"; // Replace with the actual blog ID
-
-    //     fetch(`/api/blog/${blogId}/comment/`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'X-CSRFToken': csrfToken,
-    //         },
-    //         body: JSON.stringify({ text }),
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         if (data.message === 'Comment created successfully') {
-    //             // Clear the comment input and remove error message
-    //             commentText.value = '';
-    //             if (noComment) noComment.style.display = 'none';
-                
-    //             // Create and append the new comment to the comments section
-    //             const commentSection = document.querySelector('.comment-section');
-    //             const newComment = document.createElement('div');
-    //             newComment.classList.add('card', 'mb-3');
-    //             newComment.innerHTML = `
-    //                 <div class="card-body">
-    //                     <h5 class="card-title">
-    //                         You
-    //                     </h5>
-    //                     <p class="card-text">${text}</p>
-    //                     <p class="card-text">
-    //                         <small class="text-muted">Just now</small>
-    //                     </p>
-    //                 </div>
-    //             `;
-    //             commentSection.appendChild(newComment);
-    //         } else {
-    //             // Handle errors (e.g., display an error message)
-    //             alert('Failed to create a comment. Please try again.');
-    //         }
-    //     })
-    //     .catch(error => {
-    //         console.error('Error:', error);
-    //     });
-    // });
 </script>
 {% endblock extra_script %}
     
