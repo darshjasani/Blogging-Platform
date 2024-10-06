@@ -53,26 +53,44 @@
     </div>
 
         <h3 class="mb-2">Comments</h3>
-        {% for comment in blog.commentmodel_set.all %}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {% if user == comment.user %}
-                            You
-                        {% else %}
-                            {{ comment.user.get_full_name|default:comment.user.username }}
-                        {% endif %}
-                    </h5>
-                    <p class="card-text">{{ comment.text }}</p>
-                    <p class="card-text">
-                        <small class="text-muted">{{ comment.created_at }}</small>
-                    </p>
+        <div class="comment-section">
+            {% for comment in blog.commentmodel_set.all %}
+                <div class="comment-card card mb-3">
+                    <div class="card-body d-flex">
+                        <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture" class="comment-profile-pic rounded-circle mr-3">
+                        <div class="comment-content w-100">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="comment-author card-title mb-0">
+                                    {% if user == comment.user %}
+                                        You
+                                    {% else %}
+                                        {{ comment.user.get_full_name|default:comment.user.username }}
+                                    {% endif %}
+                                </h5>
+                                <p class="comment-time card-text mb-0">
+                                    <small class="text-muted">
+                                        {% now "U" as current_time %}
+                                        {% if comment.created_at|timesince  %}
+                                            {% if comment.created_at|timesince == "1 minutes" %}
+                                                Just now
+                                            {% else %}
+                                                {{ comment.created_at|timesince }} ago
+                                            {% endif %}
+                                        {% else %}
+                                            {{ comment.created_at|date:"M j, Y" }}
+                                        {% endif %}
+                                    </small>
+                                </p>
+                            </div>
+                            <p class="comment-text card-text mt-2">{{ comment.text }}</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        {% empty %}
-            <p id="no-comment">No comments yet.</p>
-        {% endfor %}
-
+            {% empty %}
+                <p id="no-comment">No comments yet.</p>
+            {% endfor %}
+        </div>
+    
         <div class="row mb-2">
             <div class="col-12 col-md-10 col-lg-8 col-xl-6">
                 <form id="comment-form" class="card card-body" method="POST">
@@ -132,6 +150,135 @@
             .catch();
         });
     });
+
+    // Get form elements
+    const commentForm = document.getElementById('comment-form');
+    const commentText = document.getElementById('comment-text');
+    const noComment = document.getElementById('no-comment');
+
+    commentForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent the default form submission
+
+        const text = commentText.value.trim(); // Get the comment text
+        const blogId = "{{ blog.id }}"; // Replace with the actual blog ID
+
+        if (!text) {
+            alert("Please write a comment before submitting.");
+            return;
+        }
+
+        // Send the POST request via Fetch API to the CommentCreateAPI
+        fetch(`/api/blog/${blogId}/comment/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({
+                text: text, 
+                parent: null, // No parent comment for now (top-level comment)
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Comment created successfully') {
+                commentText.value = ''; // Clear the input field
+                if (noComment) noComment.style.display = 'none'; // Hide "no comments yet" message if it exists
+                
+                // Add the new comment to the comments section
+                const commentSection = document.querySelector('.comment-section');
+                const newComment = document.createElement('div');
+                newComment.classList.add('comment-card', 'card', 'mb-3');
+                newComment.innerHTML = `
+                    <div class="card-body d-flex">
+                        <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture" class="comment-profile-pic rounded-circle mr-3">
+                        <div class="comment-content w-100">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="comment-author card-title mb-0">You</h5>
+                                <p class="comment-time card-text mb-0">
+                                    <small class="text-muted">Just now</small>
+                                </p>
+                            </div>
+                            <p class="comment-text card-text mt-2">${text}</p>
+                        </div>
+                    </div>
+                `;
+                commentSection.appendChild(newComment); // Append the new comment to the comment section
+            } else {
+                alert('Failed to create a comment. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
 </script>
+
+<style>
+    /* Style the overall comment card */
+    .comment-card {
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        border-radius: 8px;
+    }
+
+    .comment-card:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Style the profile picture */
+    .comment-profile-pic {
+        width: 50px;
+        height: 50px;
+        margin-right: 15px; /* Add space between profile pic and content */
+    }
+
+    /* Style the author name */
+    .comment-author {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #333;
+        margin-right: 10px; /* Add space between author and comment content */
+    }
+
+    /* Style the comment text */
+    .comment-text {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.6;
+        padding-left: 10px;
+        border-left: 4px solid #007bff;
+        margin-left: 65px; /* Adds space between the comment and profile pic */
+    }
+
+    /* Style the time of the comment */
+    .comment-time {
+        font-size: 0.875rem;
+        color: #888;
+        margin-left: auto; /* Align the date to the right */
+    }
+
+    /* Extra spacing for the entire card */
+    .comment-card .card-body {
+        padding: 20px;
+        display: flex;
+        align-items: flex-start; /* Align the profile picture with the top of the comment */
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+        .comment-author,
+        .comment-time {
+            font-size: 1rem;
+        }
+
+        .comment-profile-pic {
+            width: 40px;
+            height: 40px;
+        }
+    }
+</style>
 {% endblock extra_script %}
     
