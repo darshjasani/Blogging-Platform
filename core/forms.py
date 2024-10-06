@@ -9,9 +9,3 @@ class CommentForm(forms.ModelForm):
         model = CommentModel
         fields = ['text', 'parent']
 
-    def clean_parent(self):
-        parent_id = self.cleaned_data.get('parent')
-        if parent_id:
-            return get_object_or_404(CommentModel, id=parent_id)
-        return None
-

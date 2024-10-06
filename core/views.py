@@ -186,20 +186,24 @@ class CommentCreateView(FormView):
     form_class = CommentForm
 
     def form_valid(self, form):
+        # Get the blog ID and parent comment ID from the form
         blog_id = self.kwargs['blog_id']
+        parent_comment_id = self.request.POST.get('parent_id')
+
         blog = get_object_or_404(BlogModel, id=blog_id)
 
-        parent_comment_id = form.cleaned_data.get('parent')
+        # If a parent comment ID is provided, get the parent comment, else None
         parent_comment = None
         if parent_comment_id:
             parent_comment = get_object_or_404(CommentModel, id=parent_comment_id)
 
-        comment = CommentModel(
+        # Create the new comment
+        new_comment = CommentModel(
             text=form.cleaned_data['text'],
             blog=blog,
             user=self.request.user,
-            parent=parent_comment  # Ensure parent_comment is either None or a valid CommentModel instance
+            parent=parent_comment  # Link the reply to the parent comment if exists
         )
-        comment.save()
+        new_comment.save()
 
         return redirect('blog_detail', pk=blog_id)

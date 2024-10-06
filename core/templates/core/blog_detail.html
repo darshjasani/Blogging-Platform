@@ -69,13 +69,34 @@
                                 </h5>
                                 <p class="comment-time card-text mb-0">
                                     <small class="text-muted">
-                                        
                                             {{comment.time_difference}}
-                                        
                                     </small>
                                 </p>
                             </div>
                             <p class="comment-text card-text mt-2">{{ comment.text }}</p>
+
+                            <div class="d-flex justify-content-end mt-3">
+                                <button type="button" class="btn btn-link reply-button" data-comment-id="{{ comment.id }}">
+                                    Reply
+                                </button>
+                                
+                            </div>
+                            <div class="row mb-2 comment-form-container" id="comment-form-container-{{ comment.id }}" style="display: none; width: 100%;">
+                                <div class="col-12">
+                                    <form id="comment-form-{{ comment.id }}" class="card card-body border-0" method="POST">
+                                        {% csrf_token %}
+                                        <div class="d-flex justify-content-between">
+                                            <label class="mb-2 h4" for="comment-text-{{ comment.id }}">
+                                                <i class="far fa-comment"></i> Comment
+                                            </label>
+                                            <!-- Cross icon to close the reply box -->
+                                            <button type="button" class="btn-close" aria-label="Close" style="position: absolute; top: 10px; right: 10px;" onclick="closeReplyForm('{{ comment.id }}')"></button>
+                                        </div>
+                                        <input id="comment-text-{{ comment.id }}" type="text" class="form-control mb-3" name="form" placeholder="Comment here...">
+                                        <button type="submit" class="btn btn-primary w-100">Submit</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -206,6 +227,33 @@
         });
     });
 
+    const replyButtons = document.querySelectorAll('.reply-button');
+
+        // Add a click event listener to each button
+        replyButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                
+                // Hide all other comment forms
+                const allForms = document.querySelectorAll('.comment-form-container');
+                allForms.forEach(function(form) {
+                    form.style.display = 'none';
+                });
+
+                // Show the comment form for the specific comment
+                const formToShow = document.getElementById('comment-form-container-' + commentId);
+                if (formToShow) {
+                    formToShow.style.display = 'block';
+                }
+            });
+        });
+
+        function closeReplyForm(commentId) {
+        const formToHide = document.getElementById('comment-form-container-' + commentId);
+        if (formToHide) {
+            formToHide.style.display = 'none';
+        }
+    }
 </script>
 
 <style>
