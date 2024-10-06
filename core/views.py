@@ -13,7 +13,8 @@ from django.views.generic.edit import FormView
 from django.shortcuts import get_object_or_404, redirect
 from .models import BlogModel, CommentModel
 from .forms import CommentForm
-
+from django.utils.timezone import now
+from datetime import datetime
 from .forms import CommentForm
 from .models import BlogModel
 
@@ -101,14 +102,30 @@ class BlogDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         blog = self.get_object()
-
+        current_time = now()
         # Filter comments that have no parent (root comments)
-        root_comments = blog.commentmodel_set.filter(parent__isnull=True)
+        root_comments = blog.commentmodel_set.filter(parent__isnull=True).order_by('-created_at')
+        for comments in root_comments:
+            time_difference = current_time - comments.created_at
+            days = time_difference.days
+            hours, remainder = divmod(time_difference.seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+
+            # Attach the time difference string to the comment object
+            if days > 0:
+                comments.time_difference = f"{days} days ago"
+            elif hours > 0:
+                comments.time_difference = f"{hours} hours  ago"
+            elif minutes > 5:
+                comments.time_difference = f"{minutes} minutes ago"
+            else:
+                comments.time_difference = "Just now"
 
         context['title'] = blog.title
         context['comment_form'] = CommentForm()
         context['root_comments'] = root_comments  # Pass root comments to the template
         return context
+
 
 
 class BlogCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):

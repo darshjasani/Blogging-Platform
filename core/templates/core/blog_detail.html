@@ -54,7 +54,7 @@
 
         <h3 class="mb-2">Comments</h3>
         <div class="comment-section">
-            {% for comment in blog.commentmodel_set.all %}
+            {% for comment in root_comments %}
                 <div class="comment-card card mb-3">
                     <div class="card-body d-flex">
                         <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture" class="comment-profile-pic rounded-circle mr-3">
@@ -69,16 +69,9 @@
                                 </h5>
                                 <p class="comment-time card-text mb-0">
                                     <small class="text-muted">
-                                        {% now "U" as current_time %}
-                                        {% if comment.created_at|timesince  %}
-                                            {% if comment.created_at|timesince == "1 minutes" %}
-                                                Just now
-                                            {% else %}
-                                                {{ comment.created_at|timesince }} ago
-                                            {% endif %}
-                                        {% else %}
-                                            {{ comment.created_at|date:"M j, Y" }}
-                                        {% endif %}
+                                        
+                                            {{comment.time_difference}}
+                                        
                                     </small>
                                 </p>
                             </div>
@@ -249,7 +242,7 @@
         color: #555;
         line-height: 1.6;
         padding-left: 10px;
-        border-left: 4px solid #007bff;
+        border-left: 2px solid #007bff;
         margin-left: 65px; /* Adds space between the comment and profile pic */
     }
 
