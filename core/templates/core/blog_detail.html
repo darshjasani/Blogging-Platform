@@ -204,18 +204,40 @@
                 const newComment = document.createElement('div');
                 newComment.classList.add('comment-card', 'card', 'mb-3');
                 newComment.innerHTML = `
-                    <div class="card-body d-flex">
-                        <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture" class="comment-profile-pic rounded-circle mr-3">
-                        <div class="comment-content w-100">
-                            <div class="d-flex justify-content-between">
-                                <h5 class="comment-author card-title mb-0">You</h5>
-                                <p class="comment-time card-text mb-0">
-                                    <small class="text-muted">Just now</small>
-                                </p>
+                <div class="card-body d-flex">
+                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture" class="comment-profile-pic rounded-circle mr-3">
+                    <div class="comment-content w-100">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="comment-author card-title mb-0">You</h5>
+                            <p class="comment-time card-text mb-0">
+                                <small class="text-muted">Just now</small>
+                            </p>
+                        </div>
+                        <p class="comment-text card-text mt-2">${text}</p>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-link reply-button" data-comment-id="${data.comment_id}">
+                                Reply
+                            </button>
+                        </div>
+                        <!-- Add the hidden reply form -->
+                        <div class="row mb-2 comment-form-container" id="comment-form-container-${data.comment_id}" style="display: none; width: 100%;">
+                            <div class="col-12">
+                                <form id="comment-form-${data.comment_id}" class="card card-body border-0" method="POST">
+                                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="mb-2 h4" for="comment-text-${data.comment_id}">
+                                            <i class="far fa-comment"></i> Comment
+                                        </label>
+                                        <!-- Cross icon to close the reply box -->
+                                        <button type="button" class="btn-close" aria-label="Close" style="position: absolute; top: 10px; right: 10px;" onclick="closeReplyForm('${data.comment_id}')"></button>
+                                    </div>
+                                    <input id="comment-text-${data.comment_id}" type="text" class="form-control mb-3" name="form" placeholder="Comment here...">
+                                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                                </form>
                             </div>
-                            <p class="comment-text card-text mt-2">${text}</p>
                         </div>
                     </div>
+                </div>
                 `;
                 commentSection.appendChild(newComment); // Append the new comment to the comment section
             } else {
