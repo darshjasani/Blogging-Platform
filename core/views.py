@@ -92,43 +92,48 @@ class BlogDetailView(DetailView):
     context_object_name = 'blog'
 
     def get(self, request, *args, **kwargs):
-        # Get the blog object
         blog = self.get_object()
-
-        # Increment the views count by 1
         blog.views += 1
         blog.save()
-
         return super().get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        blog = self.get_object()
+    def calculate_time_difference(self, comments):
+        """ Helper function to calculate time difference for each comment and its replies. """
         current_time = now()
-        # Filter comments that have no parent (root comments)
-        root_comments = blog.commentmodel_set.filter(parent__isnull=True).order_by('-created_at')
-        for comments in root_comments:
-            time_difference = current_time - comments.created_at
+        for comment in comments:
+            time_difference = current_time - comment.created_at
             days = time_difference.days
             hours, remainder = divmod(time_difference.seconds, 3600)
             minutes, _ = divmod(remainder, 60)
 
-            # Attach the time difference string to the comment object
+            # Dynamically attach the time difference string to the comment object using setattr
             if days > 0:
-                comments.time_difference = f"{days} days ago"
+                setattr(comment, 'time_difference', f"{days} days ago")
             elif hours > 0:
-                comments.time_difference = f"{hours} hours  ago"
+                setattr(comment, 'time_difference', f"{hours} hours ago")
             elif minutes > 5:
-                comments.time_difference = f"{minutes} minutes ago"
+                setattr(comment, 'time_difference', f"{minutes} minutes ago")
             else:
-                comments.time_difference = "Just now"
-            
-            replies = comments.commentmodel_set.all().order_by('created_at')  # Get all replies (children) for the comment
-            comments.replies = replies
+                setattr(comment, 'time_difference', "Just now")
 
-        context['title'] = blog.title
+            # Recursively calculate time difference for replies (nested comments)
+            self.calculate_time_difference(comment.commentmodel_set.all())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        blog = self.get_object()
+
+        # Get all root comments (comments with no parent)
+        root_comments = blog.commentmodel_set.filter(parent__isnull=True).order_by('-created_at')
+
+        # Calculate time difference for each comment (including replies)
+        #self.calculate_time_difference(root_comments)
+
+        
+        # Pass root comments to the template
+        context['root_comments'] = root_comments
         context['comment_form'] = CommentForm()
-        context['root_comments'] = root_comments  # Pass root comments to the template
+
         return context
 
 

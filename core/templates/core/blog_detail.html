@@ -55,79 +55,7 @@
     <h3 class="mb-2">Comments</h3>
     <div class="comment-section">
         {% for comment in root_comments %}
-            <div class="comment-card card mb-3">
-                <div class="card-body d-flex">
-                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture" class="comment-profile-pic rounded-circle mr-3">
-                    <div class="comment-content w-100">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="comment-author card-title mb-0">
-                                {% if user == comment.user %}
-                                    You
-                                {% else %}
-                                    {{ comment.user.get_full_name|default:comment.user.username }}
-                                {% endif %}
-                            </h5>
-                            <p class="comment-time card-text mb-0">
-                                <small class="text-muted">{{ comment.time_difference }}</small>
-                            </p>
-                        </div>
-                        <p class="comment-text card-text mt-2">{{ comment.text }}</p>
-    
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="button" class="btn btn-link reply-button" data-comment-id="{{ comment.id }}">
-                                Reply
-                            </button>
-                        </div>
-    
-                        <!-- Move replies below the Reply button, on a separate line -->
-                        {% if comment.replies.exists %}
-                            <div class="replies mt-3">
-                                {% for reply in comment.replies %}
-                                    <div class="reply-card card mb-2 ml-4">
-                                        <div class="card-body d-flex">
-                                            <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture" class="comment-profile-pic rounded-circle mr-3">
-                                            <div class="comment-content w-100">
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="comment-author card-title mb-0">
-                                                        {% if user == reply.user %}
-                                                            You
-                                                        {% else %}
-                                                            {{ reply.user.get_full_name|default:reply.user.username }}
-                                                        {% endif %}
-                                                    </h6>
-                                                    <p class="comment-time card-text mb-0">
-                                                        <small class="text-muted">{{ reply.created_at }}</small>
-                                                    </p>
-                                                </div>
-                                                <p class="comment-text card-text mt-2">{{ reply.text }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-    
-                        <!-- Reply form -->
-                        <div class="row mb-2 comment-form-container" id="comment-form-container-{{ comment.id }}" style="display: none; width: 100%;">
-                            <div class="col-12">
-                                <form id="comment-form-{{ comment.id }}" class="card card-body border-0" method="POST">
-                                    {% csrf_token %}
-                                    <div class="d-flex justify-content-between">
-                                        <label class="mb-2 h4" for="comment-text-{{ comment.id }}">
-                                            <i class="far fa-comment"></i> Comment
-                                        </label>
-                                        <!-- Cross icon to close the reply box -->
-                                        <button type="button" class="btn-close" aria-label="Close" style="position: absolute; top: 10px; right: 10px;" onclick="closeReplyForm('{{ comment.id }}')"></button>
-                                    </div>
-                                    <input id="comment-text-{{ comment.id }}" type="text" class="form-control mb-3" name="form" placeholder="Reply here...">
-                                    <input type="hidden" name="parent" value="{{ comment.id }}"> <!-- Hidden field for parent comment ID -->
-                                    <button type="submit" class="btn btn-primary w-100">Reply</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% include 'core/comment.html' with comment=comment %}
         {% empty %}
             <p id="no-comment">No comments yet.</p>
         {% endfor %}
@@ -159,7 +87,7 @@
 <script>
     // Prepare JS CSRF Token
     const csrfToken = "{{ csrf_token }}";
-    const blogId = 3;
+    const blogId = "{{blog.id}}";
     // Like/Unlike Script
     document.addEventListener('DOMContentLoaded', function () {
         const likeButton = document.getElementById('like-button');
@@ -315,23 +243,20 @@
     
     document.querySelectorAll('.reply-button').forEach(function(button) {
     button.addEventListener('click', function() {
-        const commentId = this.getAttribute('data-comment-id');
+        const commentId = this.getAttribute('data-comment-id'); // This will get the ID of the comment being replied to
         const replyForm = document.getElementById('comment-form-container-' + commentId);
+
+        // Show the reply form for the specific comment
+        replyForm.style.display = 'block';
 
         // Add a submit event listener to the reply form
         replyForm.querySelector('form').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission
 
-            const replyText = replyForm.querySelector('input[name="form"]').value.trim(); // Get reply text
+            const replyText = replyForm.querySelector('input[name="form"]').value.trim(); // Get the reply text
 
             if (!replyText) {
                 alert("Please write a reply before submitting.");
-                return;
-            }
-
-            // Ensure blogId is defined correctly before making the fetch request
-            if (!blogId) {
-                console.error("Blog ID is not defined.");
                 return;
             }
 
@@ -344,17 +269,16 @@
                 },
                 body: JSON.stringify({
                     text: replyText,
-                    parent: commentId // Send the parent comment ID for nested replies
+                    parent: commentId // The ID of the comment being replied to (could be a root comment or a reply)
                 }),
             })
             .then(response => response.json())
             .then(data => {
                 if (data.message === 'Comment created successfully') {
+                    
+
                     // Refresh the page to display the new comment
                     window.location.reload();
-
-                    // Optionally, you can update the DOM with the new reply without refreshing the page
-                    replyForm.querySelector('input[name="form"]').value = ''; // Clear the input field
                 } else {
                     alert('Failed to add reply. Please try again.');
                 }
@@ -365,6 +289,7 @@
         });
     });
 });
+
 
 </script>
 

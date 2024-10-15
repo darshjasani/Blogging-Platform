@@ -1,71 +1,54 @@
-{% csrf_token %}
-{% load crispy_forms_tags %}
-    
-{% block content %}
 <div class="comment-card card mb-3">
-    <div class="card-body">
-        <h5 class="comment-author card-title">
-            {% if user == comment.user %}
-                You
-            {% else %}
-                {{ comment.user.get_full_name|default:comment.user.username }}
+    <div class="card-body d-flex">
+        <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture" class="comment-profile-pic rounded-circle mr-3">
+        <div class="comment-content w-100">
+            <div class="d-flex justify-content-between">
+                <h5 class="comment-author card-title mb-0">
+                    {% if user == comment.user %}
+                        You
+                    {% else %}
+                        {{ comment.user.get_full_name|default:comment.user.username }}
+                    {% endif %}
+                </h5>
+                <p class="comment-time card-text mb-0">
+                    <small class="text-muted">{{ comment.time_difference }}</small>
+                </p>
+            </div>
+            <p class="comment-text card-text mt-2">{{ comment.text }}</p>
+
+            <div class="d-flex justify-content-end mt-3">
+                <button type="button" class="btn btn-link reply-button" data-comment-id="{{ comment.id }}">
+                    Reply
+                </button>
+            </div>
+
+            <!-- Reply form -->
+            <div class="row mb-2 comment-form-container" id="comment-form-container-{{ comment.id }}" style="display: none; width: 100%;">
+                <div class="col-12">
+                    <form id="comment-form-{{ comment.id }}" class="card card-body border-0" method="POST">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <label class="mb-2 h4" for="comment-text-{{ comment.id }}">
+                                <i class="far fa-comment"></i> Comment
+                            </label>
+                            <!-- Cross icon to close the reply box -->
+                            <button type="button" class="btn-close" aria-label="Close" style="position: absolute; top: 10px; right: 10px;" onclick="closeReplyForm('{{ comment.id }}')"></button>
+                        </div>
+                        <input id="comment-text-{{ comment.id }}" type="text" class="form-control mb-3" name="form" placeholder="Reply here...">
+                        <input type="hidden" name="parent" value="{{ comment.id }}"> <!-- Hidden field for parent comment ID -->
+                        <button type="submit" class="btn btn-primary w-100">Reply</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Nested replies (recursive inclusion) -->
+            {% if comment.commentmodel_set.all %}
+                <div class="replies mt-3 ml-4">
+                    {% for reply in comment.commentmodel_set.all %}
+                        {% include 'core/comment.html' with comment=reply %}
+                    {% endfor %}
+                </div>
             {% endif %}
-        </h5>
-        <p class="comment-text card-text">{{ comment.text }}</p>
-        <p class="comment-time card-text">
-            <small class="text-muted">{{ comment.created_at }}</small>
-        </p>
+        </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_script %}
-<style>
-    /* Style the overall comment card */
-    .comment-card {
-        border: 1px solid #e0e0e0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: box-shadow 0.3s ease;
-        border-radius: 8px;
-    }
-
-    .comment-card:hover {
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    /* Style the author name */
-    .comment-author {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Style the comment text */
-    .comment-text {
-        font-size: 1rem;
-        color: #555;
-        line-height: 1.6;
-        padding-left: 10px;
-        border-left: 4px solid #007bff;
-    }
-
-    /* Style the time of the comment */
-    .comment-time {
-        font-size: 0.875rem;
-        color: #888;
-        margin-top: 0.5rem;
-    }
-
-    /* Extra spacing for the entire card */
-    .comment-card .card-body {
-        padding: 20px;
-    }
-
-    /* Add subtle hover effect to comment text */
-    .comment-text:hover {
-        background-color: #f9f9f9;
-        border-left-color: #0056b3;
-    }
-</style>
-{% endblock extra_script %}
