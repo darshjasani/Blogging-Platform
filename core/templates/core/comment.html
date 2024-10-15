@@ -20,6 +20,12 @@
                 <button type="button" class="btn btn-link reply-button" data-comment-id="{{ comment.id }}">
                     Reply
                 </button>
+
+                {% if comment.commentmodel_set.all %}
+                    <button type="button" class="btn btn-link show-replies-button" data-comment-id="{{ comment.id }}">
+                        Show Replies
+                    </button>
+                {% endif %}
             </div>
 
             <!-- Reply form -->
@@ -41,9 +47,9 @@
                 </div>
             </div>
 
-            <!-- Nested replies (recursive inclusion) -->
+            <!-- Nested replies (initially hidden) -->
             {% if comment.commentmodel_set.all %}
-                <div class="replies mt-3 ml-4">
+                <div class="replies mt-3 ml-4" id="replies-container-{{ comment.id }}" style="display: none;">
                     {% for reply in comment.commentmodel_set.all %}
                         {% include 'core/comment.html' with comment=reply %}
                     {% endfor %}
@@ -52,3 +58,34 @@
         </div>
     </div>
 </div>
+
+
+{% block extra_script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    // Select all "Show Replies" buttons
+    const showRepliesButtons = document.querySelectorAll('.show-replies-button');
+
+    showRepliesButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            const repliesContainer = document.getElementById('replies-container-' + commentId);
+
+            // Check if the repliesContainer exists before trying to toggle it
+            if (repliesContainer) {
+                if (repliesContainer.style.display === 'none' || repliesContainer.style.display === '') {
+                    // Show the replies
+                    repliesContainer.style.display = 'block';
+                    this.innerText = 'Hide Replies';
+                } else {
+                    // Hide the replies
+                    repliesContainer.style.display = 'none';
+                    this.innerText = 'Show Replies';
+                }
+            }
+        });
+    });
+});
+
+</script>
+{% endblock extra_script %}
