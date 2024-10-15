@@ -8,10 +8,11 @@ from .views import CommentCreateView
 urlpatterns = [
     path('', views.HomePageView.as_view(), name='home'),
     path('blog/post/', views.BlogCreateView.as_view(), name='post'),
+    path('blog/<int:blog_id>/comment/', CommentCreateView.as_view(), name='comment_create'),
     path('blog/<int:pk>/', views.BlogDetailView.as_view(), name='blog_detail'),
     path('blog/update/<int:pk>/', views.BlogUpdateView.as_view(), name='blog_update'),
     path('blog/delete/<int:pk>/', views.BlogDeleteView.as_view(), name='blog_delete'),
-    path('blog/<int:blog_id>/comment/', CommentCreateView.as_view(), name='comment_create'),
+    
     # API
     path('api/like-toggle/', api_views.LikeToggleAPIView.as_view(), name='like-toggle'),
     path('api/blog/<int:blog_id>/comment/', api_views.CommentCreateAPI.as_view(), name='create_comment_api'),

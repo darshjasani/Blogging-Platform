@@ -10,5 +10,8 @@ class LikeToggleSerializer(serializers.Serializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentModel
-        fields = ['text']
+        fields = ['id', 'text', 'parent']
+
+    def create(self, validated_data):
+        return CommentModel.objects.create(**validated_data)
 

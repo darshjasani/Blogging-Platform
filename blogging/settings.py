@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # Third party
     'rest_framework',
     'crispy_forms',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'livereload.middleware.LiveReloadScript',
+    'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = "blogging.urls"
@@ -71,6 +74,11 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    # Add other domains/ports as necessary
 ]
 
 WSGI_APPLICATION = "blogging.wsgi.application"

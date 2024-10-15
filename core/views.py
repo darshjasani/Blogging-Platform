@@ -17,7 +17,9 @@ from django.utils.timezone import now
 from datetime import datetime
 from .forms import CommentForm
 from .models import BlogModel
-
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
 
 class LoginView(auth_views.LoginView):
     template_name = 'core/form.html'    
@@ -120,6 +122,9 @@ class BlogDetailView(DetailView):
                 comments.time_difference = f"{minutes} minutes ago"
             else:
                 comments.time_difference = "Just now"
+            
+            replies = comments.commentmodel_set.all().order_by('created_at')  # Get all replies (children) for the comment
+            comments.replies = replies
 
         context['title'] = blog.title
         context['comment_form'] = CommentForm()
@@ -182,7 +187,7 @@ class BlogDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
         context['title'] = 'Delete Blog'
         return context
 
-class CommentCreateView(FormView):
+class CommentCreateView(APIView):
     form_class = CommentForm
 
     def form_valid(self, form):
@@ -207,3 +212,7 @@ class CommentCreateView(FormView):
         new_comment.save()
 
         return redirect('blog_detail', pk=blog_id)
+
+    def post(self, request, blog_id):
+        # Your logic for handling comment creation
+        return Response({'message': 'Comment created successfully'}, status=status.HTTP_201_CREATED)

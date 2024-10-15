@@ -31,7 +31,6 @@ class LikeToggleAPIView(APIView):
 
 
 class CommentCreateAPI(APIView):
-
     def post(self, request, blog_id):
         # Check if the user is authenticated
         if not request.user.is_authenticated:
@@ -40,7 +39,7 @@ class CommentCreateAPI(APIView):
         # Get the associated blog
         blog = get_object_or_404(BlogModel, pk=blog_id)
 
-        # Get the parent comment if provided
+        # Get the parent comment if provided (for replies)
         parent_comment_id = request.data.get('parent')
         parent_comment = None
         if parent_comment_id:
@@ -50,5 +49,6 @@ class CommentCreateAPI(APIView):
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(blog=blog, user=request.user, parent=parent_comment)  # Save with parent if exists
-            return Response({'message': 'Comment created successfully'}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Comment created successfully', 'comment_id': serializer.data['id']}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
