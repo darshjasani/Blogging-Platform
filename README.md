@@ -4,13 +4,14 @@ This project is a blogging website built with Django, allowing users to create, 
 
 ## Features
 
-- User authentication (registration, login, and logout)
-- Create, update, and delete blog posts
-- Commenting system for each blog post
-- Pagination for blog posts
-- Search functionality to filter blog posts by title, content, or author
-- Sorting options for blog posts by date, views, and likes
-- Responsive design for mobile and desktop views
+- **User Authentication**: Users can register, log in, and manage their profiles.
+- **Blog Management**: Create, update, and delete blog posts with rich content and media support.
+- **Commenting System**: Users can comment on posts, fostering discussions and community engagement.
+- **Nested Comments**: Support for threaded comments allows users to reply to specific comments, enhancing the conversation flow.
+- **Pagination**: Easily navigate through numerous blog posts without overwhelming the user interface.
+- **Search Functionality**: Quickly find relevant content by searching blog titles, content, or authors.
+- **Sorting Options**: Sort posts by date, views, or likes to discover trending content.
+- **Responsive Design**: The website is optimized for both mobile and desktop users, ensuring a seamless experience across devices.
 
 ## Technologies Used
 
