@@ -33,3 +33,8 @@ This project is a blogging website built with Django, allowing users to create, 
 - HTML, CSS, Bootstrap for front-end
 - SQL (or any other database of your choice)
 - JavaScript for client-side interactions
+
+## Glance
+
+<img width="1437" alt="image" src="https://github.com/user-attachments/assets/fa728799-c88b-4dd5-a32f-3c39ab2f2a2a">
+
